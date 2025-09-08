@@ -40,3 +40,19 @@ This document summarizes how the repo aligns with three core papers and lists TO
 - Replace simple ROI integration with Gaussian peak fit + linear background windowing.
 - Expose calibration API: `counts_to_tbk(counts, live_time, geom_features, calib_table)`.
 - Allow entering phantom-derived look-up tables or regression for CPS↔TBK.
+
+## Synthetic Data Policy
+
+All data used for calibration and testing in this repository are **synthetic**.
+- Phantom data are generated in code (e.g. `_make_synth_phantoms`) and used only for tests/CI.
+- No real WBKC spectra, phantom tables, or subject data are included.
+- Parameter ranges are loosely inspired by published studies, but the actual numbers are simulated.
+- This ensures confidentiality while still enabling reproducible workflows.
+
+## Synthetic Data Policy
+
+All data used for calibration and testing in this repository are **synthetic**.
+- Phantom data are generated in code (e.g. `_make_synth_phantoms`) and used only for tests/CI.
+- No real WBKC spectra, phantom tables, or subject data are included.
+- Parameter ranges are loosely inspired by published studies, but the actual numbers are simulated.
+- This ensures confidentiality while still enabling reproducible workflows.

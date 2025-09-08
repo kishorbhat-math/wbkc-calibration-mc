@@ -79,3 +79,17 @@ Required headers:
 - Kuriyan R. et al., 2020. *The Thin But Fat Phenotype is Uncommon at Birth in Indian Babies* (WBKC + neonatal body composition).
 - Naqvi S. et al., 2018. *The development of a whole-body potassium counter for the measurement of body cell mass in adult humans* (WBKC construction, Monte Carlo geometry).
 - Kuriyan R. et al., 2019. *Estimation of protein requirements in Indian pregnant women using a whole-body potassium counter* (TBK accretion in pregnancy).
+## Synthetic Data
+
+All phantom and subject data used in this repository are **synthetic**.
+- Test phantoms are generated on the fly using `_make_synth_phantoms` in the test suite.
+- No real subject or phantom data are included.
+- Parameter ranges (e.g., weight, height, TBK values) are inspired by published studies,
+  but actual numbers are randomly simulated for reproducibility and confidentiality.
+## Synthetic Data
+
+All phantom and subject data used in this repository are **synthetic**.
+- Test phantoms are generated on the fly using `_make_synth_phantoms` in the test suite.
+- No real subject or phantom data are included.
+- Parameter ranges (e.g., weight, height, TBK values) are inspired by published studies,
+  but actual numbers are randomly simulated for reproducibility and confidentiality.

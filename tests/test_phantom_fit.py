@@ -2,6 +2,8 @@
 import pandas as pd
 from wbkc.calib_fit import fit_params
 
+# NOTE: This function generates purely synthetic phantom data for testing only.
+ 
 def _make_synth_phantoms(n=6, seed=0, true_cps_per_tbk=100.0, a=0.30, b=0.70, noise_rel=0.02):
     rng = np.random.default_rng(seed)
     weight = rng.uniform(50, 95, size=n)       # kg
