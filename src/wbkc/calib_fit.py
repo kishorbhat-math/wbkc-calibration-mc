@@ -1,11 +1,13 @@
 ﻿from __future__ import annotations
 import json
+from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 from scipy.optimize import least_squares
 
+from .calibration import CPS2TBKCalib
 
 REQUIRED_COLS = ["TBK_true", "cps_measured", "weight_kg", "height_cm"]
 
@@ -26,27 +28,30 @@ def load_phantoms(path: str | Path) -> pd.DataFrame:
 
 def _predict_cps(tbk: np.ndarray, wkg: np.ndarray, hcm: np.ndarray, cps_per_tbk: float, a: float, b: float) -> np.ndarray:
     ratio = wkg / np.maximum(hcm, 1e-6)
-    eff_corr = 1.0 / np.maximum(a * ratio + b, 1e-3)  # efficiency correction (dimensionless)
-    cps_eff = cps_per_tbk * eff_corr                    # cps per TBK for given geometry
+    eff_corr = 1.0 / np.maximum(a * ratio + b, 1e-3)   # dimensionless
+    cps_eff  = cps_per_tbk * eff_corr
     return tbk * cps_eff
 
 def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30, 0.70)) -> Dict[str, float]:
     """
-    Fit cps_per_TBK, a, b to minimize residuals between measured cps and model prediction:
-       cps_measured ≈ TBK_true * cps_per_TBK / (a * (w/h) + b)
+    Fit cps_per_TBK, a, b by minimizing LOG residuals (robust to multiplicative noise):
+        log(cps_measured) ~= log( TBK_true * cps_per_TBK / (a*(w/h)+b) )
     """
     tbk = df["TBK_true"].to_numpy(float)
     cps = df["cps_measured"].to_numpy(float)
     wkg = df["weight_kg"].to_numpy(float)
     hcm = df["height_cm"].to_numpy(float)
 
+    eps = 1e-12
     def residuals(theta):
         cps_per_tbk, a, b = theta
         pred = _predict_cps(tbk, wkg, hcm, cps_per_tbk, a, b)
-        return (cps - pred)
+        # log-residuals; guard small values
+        return np.log(np.maximum(cps, eps)) - np.log(np.maximum(pred, eps))
 
-    lb = [1e-6, -10.0, 1e-3]   # allow a to be negative if data suggest; keep b>0
-    ub = [1e6,  10.0,  10.0]
+    # Keep cps_per_tbk positive; b positive; a can be slightly negative if data suggest
+    lb = [1e-6, -5.0, 1e-3]
+    ub = [1e6,   5.0, 10.0]
     res = least_squares(residuals, x0=np.array(init, float), bounds=(lb, ub), max_nfev=20000)
     cps_per_tbk, a, b = map(float, res.x)
     return {"cps_per_TBK": cps_per_tbk, "a": a, "b": b}
