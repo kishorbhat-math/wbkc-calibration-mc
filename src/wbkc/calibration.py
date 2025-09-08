@@ -1,8 +1,7 @@
 
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import Optional, Dict, Any
-import numpy as np
+from typing import Optional
 
 @dataclass
 class GeometryFeatures:
