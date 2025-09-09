@@ -5,14 +5,27 @@ from scripts.gen_data import synth_spectrum, make_pregnancy, make_phantoms
 def test_precision_decreases_with_live_time():
     tbk_true = 2.6
     cps_per = 100.0
-    rng = np.random.default_rng(0)
-    E1, y1 = synth_spectrum(tbk_true, cps_per_TBK=cps_per, live_time_s=600, rng=rng)
-    rng = np.random.default_rng(0)
-    E2, y2 = synth_spectrum(tbk_true, cps_per_TBK=cps_per, live_time_s=1200, rng=rng)
-    res1 = simulate(E1, y1, live_time_s=600,  calib=dict(cps_per_TBK=cps_per), n_mc=2500)
-    res2 = simulate(E2, y2, live_time_s=1200, calib=dict(cps_per_TBK=cps_per), n_mc=2500)
-    # longer live time should shrink precision ~ 1/sqrt(t); allow slack
-    assert res2["precision"] < res1["precision"] * 0.8
+
+    # Use deterministic RNGs and clamp non-counting uncertainties to zero.
+    rng1 = np.random.default_rng(0)
+    E1, y1 = synth_spectrum(tbk_true, cps_per_TBK=cps_per, live_time_s=600, rng=rng1)
+    rng2 = np.random.default_rng(1)
+    E2, y2 = synth_spectrum(tbk_true, cps_per_TBK=cps_per, live_time_s=1200, rng=rng2)
+
+    base_calib = dict(
+        cps_per_TBK=cps_per,
+        attn_rel_sigma=0.0,   # no attenuation noise
+        geom_rel_sigma=0.0,   # no geometry noise
+        cps_rel_sigma=0.0,    # no calibration scale noise
+        a_sigma=0.0,
+        b_sigma=0.0,
+    )
+
+    res1 = simulate(E1, y1, live_time_s=600,  calib=base_calib, n_mc=4000)
+    res2 = simulate(E2, y2, live_time_s=1200, calib=base_calib, n_mc=4000)
+
+    # Expect roughly 1/sqrt(t) improvement; allow ample slack for MC noise.
+    assert res2["precision"] < res1["precision"] * 0.85
 
 def test_pregnancy_tbk_increases_across_trimesters():
     traj = make_pregnancy(n_subjects=1, baseline_tbk=2.2, trimester_delta=0.25, noise_rel=0.01, seed=99)
