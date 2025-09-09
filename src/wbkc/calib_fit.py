@@ -67,7 +67,7 @@ def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30
     return {"cps_per_TBK": cps_per_tbk_hat, "a": a_hat, "b": b_hat}
 
 def save_params(params: Dict[str, float], path: str | Path) -> None:
-    p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
+    p = Path(path)`n    p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "w", encoding="utf-8") as f:
         json.dump(params, f, indent=2)
 

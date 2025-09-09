@@ -3,7 +3,7 @@ Signal processing helpers for WBKC spectra:
 - detrend / sg_smooth
 - detect_peak / find_roi
 - fit_peak_linear_bg / estimate_peak_area
-- NEW: sideband-based background estimator (linear across ROI)
+- sideband-based background estimator (linear across ROI)
 """
 from __future__ import annotations
 import numpy as np
@@ -22,7 +22,8 @@ def detrend(energy_keV: np.ndarray, counts: np.ndarray, order: int = 1) -> np.nd
 
 def sg_smooth(counts: np.ndarray, window_length: int = 31, polyorder: int = 3) -> np.ndarray:
     wl = int(window_length)
-    if wl % 2 == 0: wl += 1
+    if wl % 2 == 0:
+        wl += 1
     wl = max(wl, polyorder + 2 + (polyorder + 2) % 2)
     wl = min(wl, max(5, len(counts) - (1 - len(counts) % 2)))
     if wl < 5 or wl > len(counts):
@@ -73,7 +74,8 @@ def fit_peak_linear_bg(energy_keV: np.ndarray, counts: np.ndarray, center_guess:
     # Window around guess
     idx = np.argmin(np.abs(x - center_guess))
     half = np.argmin(np.abs(x - (center_guess + window_keV))) - idx
-    lo = max(0, idx - abs(half)); hi = min(len(x), idx + abs(half) + 1)
+    lo = max(0, idx - abs(half))
+    hi = min(len(x), idx + abs(half) + 1)
     xw = x[lo:hi]
     # mild conditioning for stability
     yw = sg_smooth(detrend(xw, y[lo:hi], order=0), window_length=21, polyorder=3)
@@ -82,7 +84,8 @@ def fit_peak_linear_bg(energy_keV: np.ndarray, counts: np.ndarray, center_guess:
     mu0 = xw[np.argmax(yw)]
     sigma0 = max(12.0, min(30.0, window_keV / 10.0))
     A0 = max(1.0, (yw.max() - np.median(yw)))
-    m0 = 0.0; b0 = float(np.median(yw))
+    m0 = 0.0
+    b0 = float(np.median(yw))
     p0 = [A0, mu0, sigma0, m0, b0]
     bounds = ([0.0, mu0 - 30.0, 5.0, -np.inf, -np.inf],
               [np.inf, mu0 + 30.0, 60.0,  np.inf,  np.inf])
@@ -93,7 +96,8 @@ def fit_peak_linear_bg(energy_keV: np.ndarray, counts: np.ndarray, center_guess:
 
     A, mu, sigma, m, b = map(float, popt)
     area = float(A * sigma * np.sqrt(2.0 * np.pi))
-    lo_int = mu - 3.0 * sigma; hi_int = mu + 3.0 * sigma
+    lo_int = mu - 3.0 * sigma
+    hi_int = mu + 3.0 * sigma
     bg_area = float(m * 0.5 * (hi_int**2 - lo_int**2) + b * (hi_int - lo_int))
     return PeakFit(A=A, mu=mu, sigma=sigma, m=m, b=b, area_counts=area, bg_area_counts=bg_area, cov=pcov)
 
@@ -122,11 +126,13 @@ def _sideband_linear_bg(energy_keV: np.ndarray, counts: np.ndarray, roi: slice, 
     xL, yL = x[L].mean(), y[L].mean()
     xR, yR = x[R].mean(), y[R].mean()
     if xR == xL:
-        m = 0.0; b = float((yL + yR)/2.0)
+        m = 0.0
+        b = float((yL + yR)/2.0)
     else:
         m = (yR - yL) / (xR - xL)
         b = yL - m * xL
-    x_lo = x[lo]; x_hi = x[hi-1]
+    x_lo = x[lo]
+    x_hi = x[hi-1]
     bg_counts = float( m * 0.5 * (x_hi**2 - x_lo**2) + b * (x_hi - x_lo) )
     # Per-bin at center (just for meta)
     xC = 0.5 * (x_lo + x_hi)
