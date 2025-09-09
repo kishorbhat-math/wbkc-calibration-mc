@@ -33,7 +33,7 @@ def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30
       2) Recover cps_per_TBK as exp(mean(log(y*(a*r + b))))
     where y = cps_measured / TBK_true, r = weight/height.
 
-    This breaks the scale degeneracy between cps_per_TBK and (a,b) and is robust to multiplicative noise.
+    Robust to multiplicative noise; breaks scale degeneracy between cps_per_TBK and (a,b).
     """
     tbk = df["TBK_true"].to_numpy(float)
     cps = df["cps_measured"].to_numpy(float)
@@ -49,12 +49,11 @@ def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30
         a, b = theta_ab
         denom = np.maximum(a * r + b, 1e-6)
         z = np.log(np.maximum(y * denom, eps))
-        zc = z - z.mean()          # remove scale; only shape remains
+        zc = z - z.mean()
         return zc
 
-    # init from provided init tuple
     a0, b0 = float(init[1]), float(init[2])
-    lb = [-5.0, 1e-3]             # allow a slightly negative; b positive
+    lb = [-5.0, 1e-3]   # a can be slightly negative; b positive
     ub = [ 5.0, 10.0]
     res_ab = least_squares(resid_ab, x0=np.array([a0, b0], float), bounds=(lb, ub), max_nfev=20000)
     a_hat, b_hat = map(float, res_ab.x)
@@ -67,7 +66,8 @@ def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30
     return {"cps_per_TBK": cps_per_tbk_hat, "a": a_hat, "b": b_hat}
 
 def save_params(params: Dict[str, float], path: str | Path) -> None:
-    p = Path(path)`n    p.parent.mkdir(parents=True, exist_ok=True)
+    p = Path(path)
+    p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "w", encoding="utf-8") as f:
         json.dump(params, f, indent=2)
 
