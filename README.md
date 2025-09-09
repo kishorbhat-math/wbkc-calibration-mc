@@ -93,3 +93,21 @@ All phantom and subject data used in this repository are **synthetic**.
 - No real subject or phantom data are included.
 - Parameter ranges (e.g., weight, height, TBK values) are inspired by published studies,
   but actual numbers are randomly simulated for reproducibility and confidentiality.
+## Streamlit app
+
+```bash
+# from repo root
+streamlit run app/streamlit_app.py
+@'
+import numpy as np, pandas as pd, pathlib
+E = np.linspace(0,3000,3001)
+mu, sig = 1461.0, 15.0
+t = 900
+rng = np.random.default_rng(11)
+bg = rng.poisson(0.00005 * t, size=E.size).astype(float)
+gauss = np.exp(-0.5*((E-mu)/sig)**2); gauss /= gauss.sum()
+true_tbk = 2.5; cps_per_TBK = 100.0
+y = bg + rng.poisson((true_tbkcps_per_TBKt)*gauss)
+out = pathlib.Path("docs/examples"); out.mkdir(parents=True, exist_ok=True)
+pd.DataFrame({"energy_keV":E,"counts":y}).to_csv(out/"spectrum_synth.csv", index=False)
+print("Wrote docs/examples/spectrum_synth.csv")
