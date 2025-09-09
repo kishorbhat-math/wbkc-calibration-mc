@@ -111,3 +111,14 @@ y = bg + rng.poisson((true_tbkcps_per_TBKt)*gauss)
 out = pathlib.Path("docs/examples"); out.mkdir(parents=True, exist_ok=True)
 pd.DataFrame({"energy_keV":E,"counts":y}).to_csv(out/"spectrum_synth.csv", index=False)
 print("Wrote docs/examples/spectrum_synth.csv")
+### Longitudinal Series tab
+
+Upload a CSV with columns:
+- `subject` (string or int)
+- `trimester` (1, 2, 3)
+- `TBK_true` (synthetic true TBK used to generate spectra)
+
+Then set live time and calibration in the sidebar. The app will generate a synthetic spectrum for each row,
+run `simulate()` to estimate TBK with uncertainty, and plot trajectories with 95% CI error bars.
+
+A ready-to-use example is here:
