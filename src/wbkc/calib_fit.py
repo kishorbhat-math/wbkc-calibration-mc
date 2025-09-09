@@ -1,13 +1,10 @@
 ﻿from __future__ import annotations
 import json
-from dataclasses import asdict
 from pathlib import Path
 from typing import Dict, Tuple
 import numpy as np
 import pandas as pd
 from scipy.optimize import least_squares
-
-from .calibration import CPS2TBKCalib
 
 REQUIRED_COLS = ["TBK_true", "cps_measured", "weight_kg", "height_cm"]
 
@@ -26,39 +23,51 @@ def load_phantoms(path: str | Path) -> pd.DataFrame:
         raise ValueError(f"Missing columns in phantom file: {missing}")
     return df.dropna(subset=REQUIRED_COLS).reset_index(drop=True)
 
-def _predict_cps(tbk: np.ndarray, wkg: np.ndarray, hcm: np.ndarray, cps_per_tbk: float, a: float, b: float) -> np.ndarray:
-    ratio = wkg / np.maximum(hcm, 1e-6)
-    eff_corr = 1.0 / np.maximum(a * ratio + b, 1e-3)   # dimensionless
-    cps_eff  = cps_per_tbk * eff_corr
-    return tbk * cps_eff
+def _ratio(weight_kg: np.ndarray, height_cm: np.ndarray) -> np.ndarray:
+    return weight_kg / np.maximum(height_cm, 1e-6)
 
 def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30, 0.70)) -> Dict[str, float]:
     """
-    Fit cps_per_TBK, a, b by minimizing LOG residuals (robust to multiplicative noise):
-        log(cps_measured) ~= log( TBK_true * cps_per_TBK / (a*(w/h)+b) )
+    Identifiable two-stage fit:
+      1) Fit a,b by flattening log(y*(a*r + b)) across samples (shape fit, scale-free)
+      2) Recover cps_per_TBK as exp(mean(log(y*(a*r + b))))
+    where y = cps_measured / TBK_true, r = weight/height.
+
+    This breaks the scale degeneracy between cps_per_TBK and (a,b) and is robust to multiplicative noise.
     """
     tbk = df["TBK_true"].to_numpy(float)
     cps = df["cps_measured"].to_numpy(float)
     wkg = df["weight_kg"].to_numpy(float)
     hcm = df["height_cm"].to_numpy(float)
 
-    eps = 1e-12
-    def residuals(theta):
-        cps_per_tbk, a, b = theta
-        pred = _predict_cps(tbk, wkg, hcm, cps_per_tbk, a, b)
-        # log-residuals; guard small values
-        return np.log(np.maximum(cps, eps)) - np.log(np.maximum(pred, eps))
+    y = cps / np.maximum(tbk, 1e-12)
+    r = _ratio(wkg, hcm)
 
-    # Keep cps_per_tbk positive; b positive; a can be slightly negative if data suggest
-    lb = [1e-6, -5.0, 1e-3]
-    ub = [1e6,   5.0, 10.0]
-    res = least_squares(residuals, x0=np.array(init, float), bounds=(lb, ub), max_nfev=20000)
-    cps_per_tbk, a, b = map(float, res.x)
-    return {"cps_per_TBK": cps_per_tbk, "a": a, "b": b}
+    # Stage 1: fit (a,b) by minimizing variance of log(y*(a*r+b))
+    eps = 1e-12
+    def resid_ab(theta_ab):
+        a, b = theta_ab
+        denom = np.maximum(a * r + b, 1e-6)
+        z = np.log(np.maximum(y * denom, eps))
+        zc = z - z.mean()          # remove scale; only shape remains
+        return zc
+
+    # init from provided init tuple
+    a0, b0 = float(init[1]), float(init[2])
+    lb = [-5.0, 1e-3]             # allow a slightly negative; b positive
+    ub = [ 5.0, 10.0]
+    res_ab = least_squares(resid_ab, x0=np.array([a0, b0], float), bounds=(lb, ub), max_nfev=20000)
+    a_hat, b_hat = map(float, res_ab.x)
+
+    # Stage 2: recover cps_per_TBK as the geometric mean of y*(a*r+b)
+    denom = np.maximum(a_hat * r + b_hat, 1e-6)
+    z = np.log(np.maximum(y * denom, eps))
+    cps_per_tbk_hat = float(np.exp(z.mean()))
+
+    return {"cps_per_TBK": cps_per_tbk_hat, "a": a_hat, "b": b_hat}
 
 def save_params(params: Dict[str, float], path: str | Path) -> None:
-    p = Path(path)
-    p.parent.mkdir(parents=True, exist_ok=True)
+    p = Path(path); p.parent.mkdir(parents=True, exist_ok=True)
     with open(p, "w", encoding="utf-8") as f:
         json.dump(params, f, indent=2)
 
