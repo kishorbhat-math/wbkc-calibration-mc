@@ -26,14 +26,32 @@ def load_phantoms(path: str | Path) -> pd.DataFrame:
 def _ratio(weight_kg: np.ndarray, height_cm: np.ndarray) -> np.ndarray:
     return weight_kg / np.maximum(height_cm, 1e-6)
 
+def _two_stage_init(y: np.ndarray, r: np.ndarray, init_ab: Tuple[float, float]) -> Tuple[float, float, float]:
+    """Stage-1: pick (a,b) to flatten log(y*(a*r+b)); Stage-2: cps := geometric mean of y*(a*r+b)."""
+    eps = 1e-12
+    def resid_ab(theta_ab):
+        a, b = theta_ab
+        denom = np.maximum(a * r + b, 1e-6)
+        z = np.log(np.maximum(y * denom, eps))
+        zc = z - z.mean()
+        return zc
+    a0, b0 = float(init_ab[0]), float(init_ab[1])
+    lb = [-5.0, 1e-3]   # a can be slightly negative; b positive
+    ub = [ 5.0, 10.0]
+    res_ab = least_squares(resid_ab, x0=np.array([a0, b0], float), bounds=(lb, ub), max_nfev=30000)
+    a_hat, b_hat = map(float, res_ab.x)
+
+    denom = np.maximum(a_hat * r + b_hat, 1e-6)
+    z = np.log(np.maximum(y * denom, eps))
+    cps_per_tbk_hat = float(np.exp(z.mean()))
+    return cps_per_tbk_hat, a_hat, b_hat
+
 def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30, 0.70)) -> Dict[str, float]:
     """
-    Identifiable two-stage fit:
-      1) Fit a,b by flattening log(y*(a*r + b)) across samples (shape fit, scale-free)
-      2) Recover cps_per_TBK as exp(mean(log(y*(a*r + b))))
-    where y = cps_measured / TBK_true, r = weight/height.
-
-    Robust to multiplicative noise; breaks scale degeneracy between cps_per_TBK and (a,b).
+    Robust identifiable fit for (cps_per_TBK, a, b):
+      - Two-stage shape init → (c_init, a_init, b_init)
+      - Joint log-residual least-squares on (c, a, b) with a tiny Tikhonov regularization on (a,b)
+        Model: log(y) ≈ log(c) - log(a*r + b), y = cps_measured / TBK_true, r = weight/height
     """
     tbk = df["TBK_true"].to_numpy(float)
     cps = df["cps_measured"].to_numpy(float)
@@ -43,27 +61,31 @@ def fit_params(df: pd.DataFrame, init: Tuple[float, float, float] = (100.0, 0.30
     y = cps / np.maximum(tbk, 1e-12)
     r = _ratio(wkg, hcm)
 
-    # Stage 1: fit (a,b) by minimizing variance of log(y*(a*r+b))
+    # Two-stage initializer
+    c0, a0, b0 = _two_stage_init(y, r, init_ab=(float(init[1]), float(init[2])))
+
+    # Joint optimization (on c, a, b). Keep them in natural space with positivity on c and b.
     eps = 1e-12
-    def resid_ab(theta_ab):
-        a, b = theta_ab
+    prior_a, prior_b = 0.30, 0.70
+    lam = 1e-3  # small regularization strength
+
+    def residuals(theta):
+        c, a, b = theta
+        c = float(np.maximum(c, 1e-6))
+        b = float(np.maximum(b, 1e-6))
         denom = np.maximum(a * r + b, 1e-6)
-        z = np.log(np.maximum(y * denom, eps))
-        zc = z - z.mean()
-        return zc
+        pred = np.log(c) - np.log(denom)
+        data_resid = np.log(np.maximum(y, eps)) - pred
+        # mild Tikhonov on (a,b)
+        reg = np.sqrt(lam) * np.array([a - prior_a, b - prior_b], dtype=float)
+        return np.concatenate([data_resid, reg])
 
-    a0, b0 = float(init[1]), float(init[2])
-    lb = [-5.0, 1e-3]   # a can be slightly negative; b positive
-    ub = [ 5.0, 10.0]
-    res_ab = least_squares(resid_ab, x0=np.array([a0, b0], float), bounds=(lb, ub), max_nfev=20000)
-    a_hat, b_hat = map(float, res_ab.x)
-
-    # Stage 2: recover cps_per_TBK as the geometric mean of y*(a*r+b)
-    denom = np.maximum(a_hat * r + b_hat, 1e-6)
-    z = np.log(np.maximum(y * denom, eps))
-    cps_per_tbk_hat = float(np.exp(z.mean()))
-
-    return {"cps_per_TBK": cps_per_tbk_hat, "a": a_hat, "b": b_hat}
+    lb = [1e-6, -5.0, 1e-6]
+    ub = [1e6,   5.0, 10.0]
+    theta0 = np.array([c0, a0, b0], float)
+    res = least_squares(residuals, x0=theta0, bounds=(lb, ub), max_nfev=50000)
+    c_hat, a_hat, b_hat = map(float, res.x)
+    return {"cps_per_TBK": c_hat, "a": a_hat, "b": b_hat}
 
 def save_params(params: Dict[str, float], path: str | Path) -> None:
     p = Path(path)
