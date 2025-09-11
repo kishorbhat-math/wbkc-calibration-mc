@@ -1,11 +1,15 @@
 ﻿import numpy as np
+
 from wbkc.model import simulate
+
 
 def make_synth(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=600, seed=0):
     rng = np.random.default_rng(seed)
     E = np.linspace(0, 3000, 3001)
     mu, sig = 1461.0, 15.0
-    gauss = np.exp(-0.5*((E-mu)/sig)**2)`r`n
+    gauss = np.exp(-0.5*((E-mu)/sig)**2)
+
+
     gauss /= gauss.sum()
     bg = rng.poisson(0.00005 * live_time_s, size=E.size).astype(float)
     y = bg + rng.poisson((true_tbk*cps_per_TBK*live_time_s)*gauss)
@@ -27,6 +31,8 @@ def test_simulate_reasonable_scale():
 
     # Expect res2 precision < res1 precision (allow 15% slack for MC noise)
     assert res2["precision"] < res1["precision"] * 0.85
+
+
 
 
 

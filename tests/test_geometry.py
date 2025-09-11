@@ -1,5 +1,7 @@
 ﻿import numpy as np
+
 from wbkc.model import simulate
+
 
 def _synth(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, seed=0):
     E = np.linspace(0, 3000, n)
@@ -8,7 +10,9 @@ def _synth(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, seed=0):
     bg = rng.poisson(0.00005 * live_time_s, size=E.size).astype(float)
     # K-40 peak
     mu, sig = 1461.0, 15.0
-    gauss = np.exp(-0.5*((E-mu)/sig)**2)`r`n
+    gauss = np.exp(-0.5*((E-mu)/sig)**2)
+
+
     gauss /= gauss.sum()
     y = bg + rng.poisson((true_tbk*cps_per_TBK*live_time_s)*gauss)
     return E, y
@@ -31,6 +35,8 @@ def test_more_geom_uncertainty_widens_ci():
     hw_low  = (res_low["ci_95"][1] - res_low["ci_95"][0]) / 2.0
     hw_high = (res_high["ci_95"][1] - res_high["ci_95"][0]) / 2.0
     assert hw_high > hw_low
+
+
 
 
 
