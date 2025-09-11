@@ -28,3 +28,4 @@ def test_manual_roi_runs():
     assert res_auto["precision"] >= 0.0 and res_roi["precision"] >= 0.0
 
 
+

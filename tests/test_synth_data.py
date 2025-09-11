@@ -46,3 +46,4 @@ def test_phantom_fit_sanity_recovers_within_bounds():
     est = fit_params(df, init=(100.0, 0.25, 0.75))
     assert abs(est["cps_per_TBK"] - 100.0) / 100.0 < 0.10
 
+
