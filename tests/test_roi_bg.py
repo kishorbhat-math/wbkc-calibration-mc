@@ -10,7 +10,7 @@ def _synth(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, seed=0):
     bg = rng.poisson(0.00005 * live_time_s, size=E.size).astype(float)
     # K-40 peak
     mu, sig = 1461.0, 15.0
-    gauss = np.exp(-0.5*((E-mu)/sig)**2)
+    gauss = np.exp(-0.5*((E-mu)/sig)**2)
 
 
     gauss /= gauss.sum()

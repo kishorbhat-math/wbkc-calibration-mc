@@ -7,7 +7,7 @@ def make_synth(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=600, seed=0):
     rng = np.random.default_rng(seed)
     E = np.linspace(0, 3000, 3001)
     mu, sig = 1461.0, 15.0
-    gauss = np.exp(-0.5*((E-mu)/sig)**2)
+    gauss = np.exp(-0.5*((E-mu)/sig)**2)
 
 
     gauss /= gauss.sum()

@@ -18,11 +18,11 @@ def test_precision_scales_with_time_counting_only():
     tbk_true = 2.8
     cps_per = 100.0
     # Deterministic spectra for two live times
-    rng1 = np.random.default_rng(10)
+    rng1 = np.random.default_rng(10)
 
 
     E1, Y1 = synth_spectrum(tbk_true, cps_per, live_time_s=600,  rng=rng1)
-    rng2 = np.random.default_rng(10)
+    rng2 = np.random.default_rng(10)
 
 
     E2, Y2 = synth_spectrum(tbk_true, cps_per, live_time_s=1800, rng=rng2)
@@ -39,7 +39,7 @@ def test_phantom_fit_recovers_cps_within_7pct():
 
 def test_pregnancy_tbk_monotone_increase():
     traj = make_pregnancy(n_subjects=1, baseline_tbk=2.1, trimester_delta=0.22, noise_rel=0.01, seed=5)
-    cps_per = 100.0
+    cps_per = 100.0
 
 
     t = 900
@@ -53,10 +53,10 @@ def test_pregnancy_tbk_monotone_increase():
 
 def test_roi_sidebands_vs_fit_same_order_of_magnitude():
     # The two ROI methods should produce TBK within a loose factor under typical conditions
-    tbk_true = 2.5
+    tbk_true = 2.5
 
 
-    cps_per = 100.0
+    cps_per = 100.0
 
 
     t = 900

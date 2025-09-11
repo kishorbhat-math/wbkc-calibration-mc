@@ -3,12 +3,16 @@ WBKC TBK estimation via Monte Carlo with configurable peak/background + geometry
 Adds uncertainty components and a variance breakdown.
 """
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Tuple, Dict, Any, Optional
+
 from . import signal
-from .calibration import GeometryFeatures, CPS2TBKCalib
+from .calibration import CPS2TBKCalib, GeometryFeatures
+
 
 @dataclass
 class Calib:

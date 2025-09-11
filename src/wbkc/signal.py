@@ -6,11 +6,14 @@ Signal processing helpers for WBKC spectra:
 - sideband-based background estimator (linear across ROI)
 """
 from __future__ import annotations
-import numpy as np
+
 from dataclasses import dataclass
-from typing import Tuple, Optional
-from scipy.signal import savgol_filter
+from typing import Optional, Tuple
+
+import numpy as np
 from scipy.optimize import curve_fit
+from scipy.signal import savgol_filter
+
 
 def detrend(energy_keV: np.ndarray, counts: np.ndarray, order: int = 1) -> np.ndarray:
     x = np.asarray(energy_keV, float)
