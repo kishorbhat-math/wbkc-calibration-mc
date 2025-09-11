@@ -1,6 +1,8 @@
 ﻿import numpy as np
+
+from scripts.gen_data import make_phantoms, make_pregnancy, synth_spectrum
 from wbkc.model import simulate
-from scripts.gen_data import synth_spectrum, make_pregnancy, make_phantoms
+
 
 def test_precision_decreases_with_live_time():
     tbk_true = 2.6

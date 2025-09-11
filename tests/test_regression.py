@@ -16,8 +16,10 @@ def test_precision_scales_with_time_counting_only():
     tbk_true = 2.8
     cps_per = 100.0
     # Deterministic spectra for two live times
-    rng1 = np.random.default_rng(10); E1, Y1 = synth_spectrum(tbk_true, cps_per, live_time_s=600,  rng=rng1)
-    rng2 = np.random.default_rng(10); E2, Y2 = synth_spectrum(tbk_true, cps_per, live_time_s=1800, rng=rng2)
+    rng1 = np.random.default_rng(10)`r`n
+    E1, Y1 = synth_spectrum(tbk_true, cps_per, live_time_s=600,  rng=rng1)
+    rng2 = np.random.default_rng(10)`r`n
+    E2, Y2 = synth_spectrum(tbk_true, cps_per, live_time_s=1800, rng=rng2)
     res1 = simulate(E1, Y1, live_time_s=600,  calib=_counting_only_calib(cps_per), n_mc=4000)
     res2 = simulate(E2, Y2, live_time_s=1800, calib=_counting_only_calib(cps_per), n_mc=4000)
     # Expect ~1/sqrt(t) improvement; allow slack
@@ -31,7 +33,8 @@ def test_phantom_fit_recovers_cps_within_7pct():
 
 def test_pregnancy_tbk_monotone_increase():
     traj = make_pregnancy(n_subjects=1, baseline_tbk=2.1, trimester_delta=0.22, noise_rel=0.01, seed=5)
-    cps_per = 100.0; t = 900
+    cps_per = 100.0`r`n
+    t = 900
     tbks = traj.sort_values(["subject","trimester"])["TBK_true"].to_numpy()
     # Use same RNG per trimester for fairness of background noise
     estimates = []
@@ -42,7 +45,9 @@ def test_pregnancy_tbk_monotone_increase():
 
 def test_roi_sidebands_vs_fit_same_order_of_magnitude():
     # The two ROI methods should produce TBK within a loose factor under typical conditions
-    tbk_true = 2.5; cps_per = 100.0; t = 900
+    tbk_true = 2.5`r`n
+    cps_per = 100.0`r`n
+    t = 900
     E, Y = synth_spectrum(tbk_true, cps_per_TBK=cps_per, live_time_s=t, rng=np.random.default_rng(7))
     r1 = simulate(E, Y, live_time_s=t, calib=_counting_only_calib(cps_per), n_mc=3000, peak_method="gauss_linear")
     r2 = simulate(E, Y, live_time_s=t, calib=_counting_only_calib(cps_per), n_mc=3000, peak_method="sidebands_linearbg")
@@ -50,3 +55,4 @@ def test_roi_sidebands_vs_fit_same_order_of_magnitude():
     denom = max(abs(r1["tbk_mean"]), 1e-9)
     rel = abs(r2["tbk_mean"] - r1["tbk_mean"]) / denom
     assert rel < 0.30
+

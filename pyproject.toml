@@ -5,26 +5,34 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "wbkc-calibration-mc"
 version = "0.1.0"
-description = "Monte Carlo scaffold for WBKC TBK estimation with Streamlit app"
-authors = [{name="wbkc-calibration-mc contributors"}]
-license = {text = "MIT"}
+description = "Whole-body K-40 TBK estimation with Monte Carlo uncertainty."
 readme = "README.md"
+license = { file = "LICENSE" }
+authors = [{ name = "Kishor Bhat" }]
 requires-python = ">=3.11"
 dependencies = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "matplotlib",
-    "streamlit",
+  "numpy>=1.24",
+  "scipy>=1.10",
+  "pandas>=2.0",
+  "plotly>=5.20",
+  "streamlit>=1.30",
+  "typing-extensions>=4.7"
 ]
 
-[project.optional-dependencies]
-dev = ["pytest", "ruff"]
+[project.urls]
+Homepage = "https://github.com/kishorbhat-math/wbkc-calibration-mc"
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["wbkc"]
+
+[tool.setuptools.package-data]
+wbkc = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-
-
+select = ["E","F","I"]
