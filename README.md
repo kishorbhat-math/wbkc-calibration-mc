@@ -1,6 +1,7 @@
+﻿![CI](https://github.com/kishorbhat-math/wbkc-calibration-mc/actions/workflows/ci.yml/badge.svg)
 # wbkc-calibration-mc
 
-Monte Carlo calibration scaffold for Whole-Body K Counting (WBKC) — **Python 3.11**.
+Monte Carlo calibration scaffold for Whole-Body K Counting (WBKC) â€” **Python 3.11**.
 
 This repository provides:
 - `src/wbkc/model.py` exposing `simulate()` to estimate **TBK** (Total Body Potassium) with uncertainty.
@@ -12,7 +13,7 @@ This repository provides:
 - `environment.yml`, `pyproject.toml`, and CI workflow.
 - MIT License.
 
-> ⚠️ This is a **starter/scaffold** intended for extension. Calibration physics and numerics are simplified.
+> âš ï¸ This is a **starter/scaffold** intended for extension. Calibration physics and numerics are simplified.
 
 ## Install
 
@@ -79,3 +80,4 @@ Required headers:
 - Kuriyan R. et al., 2020. *The Thin But Fat Phenotype is Uncommon at Birth in Indian Babies* (WBKC + neonatal body composition).
 - Naqvi S. et al., 2018. *The development of a whole-body potassium counter for the measurement of body cell mass in adult humans* (WBKC construction, Monte Carlo geometry).
 - Kuriyan R. et al., 2019. *Estimation of protein requirements in Indian pregnant women using a whole-body potassium counter* (TBK accretion in pregnancy).
+
