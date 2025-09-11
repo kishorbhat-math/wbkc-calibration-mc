@@ -35,3 +35,4 @@ def test_calibration_uncertainty_affects_fraction():
     f_more = more["meta"]["uncertainty"]["components"]["calibration"]["fraction_of_explained"]
     assert f_more > f_base
 
+

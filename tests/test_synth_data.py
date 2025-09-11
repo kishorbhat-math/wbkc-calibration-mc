@@ -45,3 +45,4 @@ def test_phantom_fit_sanity_recovers_within_bounds():
     df = make_phantoms(n=10, true_cps_per_tbk=100.0, a=0.30, b=0.70, noise_rel=0.03, seed=7)
     est = fit_params(df, init=(100.0, 0.25, 0.75))
     assert abs(est["cps_per_TBK"] - 100.0) / 100.0 < 0.10
+

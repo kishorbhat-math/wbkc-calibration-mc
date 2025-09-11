@@ -56,3 +56,4 @@ def test_roi_sidebands_vs_fit_same_order_of_magnitude():
     rel = abs(r2["tbk_mean"] - r1["tbk_mean"]) / denom
     assert rel < 0.30
 
+

@@ -32,3 +32,4 @@ def test_more_geom_uncertainty_widens_ci():
     hw_high = (res_high["ci_95"][1] - res_high["ci_95"][0]) / 2.0
     assert hw_high > hw_low
 
+

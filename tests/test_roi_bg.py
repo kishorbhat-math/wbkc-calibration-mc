@@ -27,3 +27,4 @@ def test_manual_roi_runs():
     res_roi  = simulate(E, y, live_time_s=800, calib=dict(cps_per_TBK=120.0), n_mc=1500, peak_method="sidebands_linearbg", roi_keV=(1410, 1510))
     assert res_auto["precision"] >= 0.0 and res_roi["precision"] >= 0.0
 
+

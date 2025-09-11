@@ -28,3 +28,4 @@ def test_simulate_reasonable_scale():
     # Expect res2 precision < res1 precision (allow 15% slack for MC noise)
     assert res2["precision"] < res1["precision"] * 0.85
 
+
