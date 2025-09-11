@@ -122,3 +122,5 @@ Then set live time and calibration in the sidebar. The app will generate a synth
 run `simulate()` to estimate TBK with uncertainty, and plot trajectories with 95% CI error bars.
 
 A ready-to-use example is here:
+
+

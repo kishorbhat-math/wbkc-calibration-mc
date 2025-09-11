@@ -1,21 +1,12 @@
 ﻿cff-version: 1.2.0
-message: "If you use wbkc-calibration-mc in your work, please cite it."
-title: "WBKC Calibration Monte Carlo (wbkc-calibration-mc)"
+message: If you use this software, please cite it using the metadata below.
+title: WBKC Calibration Monte Carlo
+version: 0.1.0
+date-released: 2025-09-11
 authors:
-  - family-names: Bhat
-    given-names: Kishor
-repository-code: "https://github.com/kishorbhat-math/wbkc-calibration-mc"
+
+family-names: Bhat
+given-names: Kishor
+repository-code: https://github.com/kishorbhat-math/wbkc-calibration-mc
+
 license: MIT
-keywords:
-  - whole-body counter
-  - potassium-40
-  - TBK
-  - gamma spectroscopy
-  - Monte Carlo
-preferred-citation:
-  type: software
-  authors:
-    - family-names: Bhat
-      given-names: Kishor
-  title: "WBKC Calibration Monte Carlo (wbkc-calibration-mc)"
-  license: MIT
