@@ -1,7 +1,7 @@
-﻿param()
-$ErrorActionPreference = "Stop"
-$here = Split-Path -Parent $MyInvocation.MyCommand.Path
-Set-Location (Join-Path $here "..")
-if (Test-Path ".\.venv\Scripts\Activate.ps1") { . .\.venv\Scripts\Activate.ps1 }
-ruff check src tests
+﻿# Runs lint and tests
+param([switch]$noLint)
+
+$ErrorActionPreference = 'Stop'
+. ..\.venv\Scripts\Activate.ps1
+if (-not $noLint) { ruff check src tests --fix }
 python -m pytest -q
