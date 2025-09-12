@@ -1,4 +1,4 @@
-"""
+﻿"""
 WBKC TBK estimation via Monte Carlo (Poisson + attenuation).
 
 This is a simplified pedagogical scaffold. Replace calibration and physics as needed.
@@ -22,7 +22,6 @@ def _integrate_roi(energy_keV: np.ndarray, counts: np.ndarray, roi: slice) -> Tu
     Return (signal_counts, background_counts) in the ROI
     using crude sidebands (outer 20% of ROI) as background estimator.
     """
-    roi_energy = energy_keV[roi]
     roi_counts = counts[roi].astype(float)
     n = len(roi_counts)
     if n < 10:
@@ -139,3 +138,4 @@ def simulate(
             "calib": calib.__dict__,
         },
     }
+
