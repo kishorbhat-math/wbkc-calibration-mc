@@ -8,10 +8,13 @@ Synthetic data helpers for WBKC.
 All outputs are synthetic; no real subject or phantom data are included.
 """
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Tuple, Optional
+from typing import Optional, Tuple
+
 import numpy as np
 import pandas as pd
+
 
 @dataclass
 class SynthParams:
