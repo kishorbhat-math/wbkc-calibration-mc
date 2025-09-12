@@ -5,7 +5,7 @@
 python -m venv .venv
 . .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install -e .[dev]
+pip install -e . ruff pytest
 import numpy as np
 from wbkc.model import simulate
 
@@ -20,5 +20,6 @@ Y = bg + rng.poisson((2.5 * 100.0 * 900) * gauss)
 
 res = simulate(E, Y, live_time_s=900, calib={"cps_per_TBK": 100.0}, n_mc=2000)
 print(res)
-.\scripts\run_tests.ps1
+ruff check src tests
+pytest -q
 .\scripts\run_app.ps1

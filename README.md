@@ -124,3 +124,8 @@ run `simulate()` to estimate TBK with uncertainty, and plot trajectories with 95
 A ready-to-use example is here:
 
 
+
+Documentation
+
+Usage Guide
+
