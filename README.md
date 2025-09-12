@@ -129,3 +129,6 @@ Documentation
 
 Usage Guide
 
+
+![CI](https://github.com/kishorbhat-math/wbkc-calibration-mc/actions/workflows/ci.yml/badge.svg)
+
