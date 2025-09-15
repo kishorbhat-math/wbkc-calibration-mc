@@ -129,3 +129,4 @@ Documentation
 
 Usage Guide
 
+nSee **[Usage](docs/USAGE.md)** for setup and examples.n
