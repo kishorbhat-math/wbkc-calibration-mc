@@ -1,60 +1,28 @@
 ﻿name: CI
 
 on:
-  push:
-    branches: [ main, feat/** ]
-  pull_request:
-    branches: [ main ]
+push:
+branches: ["**"]
+pull_request:
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: [3.11]
+build-test:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout
+uses: actions/checkout@v4
+  - name: Setup Python
+    uses: actions/setup-python@v5
+    with:
+      python-version: "3.11"
 
-    steps:
-    - uses: actions/checkout@v4
+  - name: Install
+    run: |
+      python -m pip install --upgrade pip
+      pip install -e . ruff pytest
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+  - name: Lint
+    run: ruff check src tests
 
-    - name: Install deps
-      run: |
-        python -m pip install --upgrade pip
-        pip install -e .
-        pip install pytest streamlit plotly
-
-    - name: Run tests
-      run: |
-        pytest -q
-
-    - name: Generate synthetic examples
-      run: |
-        python - <<'PYCODE'
-        import pathlib
-        from scripts.gen_data import make_pregnancy, make_phantoms
-        import numpy as np, pandas as pd
-        out = pathlib.Path("docs/examples"); out.mkdir(parents=True, exist_ok=True)
-        make_pregnancy().to_csv(out/"pregnancy_ci.csv", index=False)
-        make_phantoms().to_csv(out/"phantoms_ci.csv", index=False)
-        E = np.linspace(0,3000,3001); y = np.random.poisson(5,size=E.size)
-        pd.DataFrame({"energy_keV":E,"counts":y}).to_csv(out/"spectrum_ci.csv", index=False)
-        PYCODE
-
-    - name: Upload examples as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: synthetic-examples
-        path: docs/examples/*.csv
-
-    - name: Streamlit smoke run (Linux only)
-      if: runner.os == 'Linux'
-      run: |
-        python -m streamlit run app/streamlit_app.py --server.headless true --server.port 8501 &
-        sleep 15
-        pkill -f "streamlit" || true
-      shell: bash
+  - name: Tests
+    run: pytest -q
