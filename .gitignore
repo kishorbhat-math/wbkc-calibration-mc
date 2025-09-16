@@ -1,21 +1,10 @@
-
-# Python
-__pycache__/
+﻿__pycache__/
 *.py[cod]
-*.pyo
-*.pyd
-*.so
 *.egg-info/
 dist/
 build/
-.coverage
 .pytest_cache/
-htmlcov/
-
-# Environments
 .venv/
-.env/
-.env.*
-
-# Streamlit cache
-.streamlit/
+.DS_Store
+Thumbs.db
+.ipynb_checkpoints/

@@ -1,7 +1,9 @@
-cff-version: 1.2.0
-message: If you use this code, please cite the following.
-title: wbkc-calibration-mc
+﻿cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+title: WBKC Calibration MC
+version: 0.1.3
 authors:
-  - family-names: Contributors
-date-released: 2025-08-25
-version: 0.1.0
+  - family-names: Bhat
+    given-names: Kishor
+date-released: 2025-09-16
+repository-code: https://github.com/kishorbhat-math/wbkc-calibration-mc
