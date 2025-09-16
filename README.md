@@ -11,3 +11,16 @@ Monte Carlo-based calibration models for WBKC (Whole Body Potassium).
 pip install -e .
 from wbkc import run_calibration
 run_calibration()
+## CLI
+After installation, you can also run from the shell:
+
+`ash
+wbkc-calibrate
+## CLI
+After installation, you can also run from the shell:
+
+`ash
+wbkc-calibrate
+
+
+```

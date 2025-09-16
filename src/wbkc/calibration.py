@@ -1,12 +1,14 @@
-
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
+
 
 @dataclass
 class GeometryFeatures:
     weight_kg: Optional[float] = None
     height_cm: Optional[float] = None
+
 
 @dataclass
 class CPS2TBKCalib:
@@ -15,7 +17,8 @@ class CPS2TBKCalib:
     This scaffold mimics WBKC practices where counts-per-second near 1461 keV are mapped to TBK via
     phantom-derived calibrations plus Monte Carlo geometry correction.
     """
-    slope: float = 1.0      # TBK per CPS (arbitrary)
+
+    slope: float = 1.0  # TBK per CPS (arbitrary)
     intercept: float = 0.0  # TBK offset (arbitrary)
 
     def efficiency_correction(self, geom: GeometryFeatures | None) -> float:

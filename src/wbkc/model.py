@@ -3,21 +3,29 @@ WBKC TBK estimation via Monte Carlo (Poisson + attenuation).
 
 This is a simplified pedagogical scaffold. Replace calibration and physics as needed.
 """
+
 from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any, Dict, Optional, Tuple
+
 import numpy as np
 import pandas as pd
-from dataclasses import dataclass
-from typing import Tuple, Dict, Any, Optional
+
 from . import signal
+
 
 @dataclass
 class Calib:
     cps_per_TBK: float = 100.0  # counts per second per unit TBK (arbitrary unit)
-    bg_cps: float = 0.1         # background counts per second within ROI
-    attn_mean: float = 1.0      # multiplicative attenuation factor
+    bg_cps: float = 0.1  # background counts per second within ROI
+    attn_mean: float = 1.0  # multiplicative attenuation factor
     attn_rel_sigma: float = 0.05  # relative sigma for attenuation (~lognormal)
 
-def _integrate_roi(energy_keV: np.ndarray, counts: np.ndarray, roi: slice) -> Tuple[float, float]:
+
+def _integrate_roi(
+    energy_keV: np.ndarray, counts: np.ndarray, roi: slice
+) -> Tuple[float, float]:
     """
     Return (signal_counts, background_counts) in the ROI
     using crude sidebands (outer 20% of ROI) as background estimator.
@@ -34,6 +42,7 @@ def _integrate_roi(energy_keV: np.ndarray, counts: np.ndarray, roi: slice) -> Tu
     bg_est = bg_per_bin * n
     sig = roi_counts.sum() - bg_est
     return float(max(sig, 0.0)), float(max(bg_est, 0.0))
+
 
 def simulate(
     energy_keV: np.ndarray | pd.Series,
@@ -108,7 +117,7 @@ def simulate(
     rel = max(calib.attn_rel_sigma, 1e-6)
     var = (rel * calib.attn_mean) ** 2
     # Solve for lognormal params
-    sigma2 = np.log(1 + var / (calib.attn_mean ** 2))
+    sigma2 = np.log(1 + var / (calib.attn_mean**2))
     mu = np.log(calib.attn_mean) - 0.5 * sigma2
 
     sig_draws = rng.poisson(lam=lam_sig, size=n_mc)
@@ -138,4 +147,3 @@ def simulate(
             "calib": calib.__dict__,
         },
     }
-

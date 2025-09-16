@@ -1,13 +1,18 @@
 """
 Generate synthetic spectra and subject metadata for WBKC Monte Carlo experiments.
 """
-import os
+
 import json
-import numpy as np
-import pandas as pd
+import os
 from pathlib import Path
 
-def synth_spectrum(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, keV_max=3000.0, seed=None):
+import numpy as np
+import pandas as pd
+
+
+def synth_spectrum(
+    true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, keV_max=3000.0, seed=None
+):
     rng = np.random.default_rng(seed)
     energy = np.linspace(0, keV_max, n)
     bg_cps_per_bin = 0.00005
@@ -21,6 +26,7 @@ def synth_spectrum(true_tbk=2.5, cps_per_TBK=100.0, live_time_s=900, n=3001, keV
     counts = bg + peak_counts
     return pd.DataFrame({"energy_keV": energy, "counts": counts})
 
+
 def main(outdir="data", n_subjects=5, seed=123):
     Path(outdir).mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(seed)
@@ -32,13 +38,19 @@ def main(outdir="data", n_subjects=5, seed=123):
             "live_time_s": int(rng.integers(600, 1500)),
             "cps_per_TBK": float(rng.uniform(80.0, 120.0)),
         }
-        df = synth_spectrum(true_tbk=subj["true_tbk"], cps_per_TBK=subj["cps_per_TBK"], live_time_s=subj["live_time_s"], seed=seed+i)
+        df = synth_spectrum(
+            true_tbk=subj["true_tbk"],
+            cps_per_TBK=subj["cps_per_TBK"],
+            live_time_s=subj["live_time_s"],
+            seed=seed + i,
+        )
         csv_path = os.path.join(outdir, f"spectrum_{subj['id']}.csv")
         df.to_csv(csv_path, index=False)
         subjects.append({**subj, "spectrum_csv": csv_path})
     with open(os.path.join(outdir, "subjects.json"), "w") as f:
         json.dump(subjects, f, indent=2)
     print(f"Wrote {n_subjects} spectra & subjects to '{outdir}'")
+
 
 if __name__ == "__main__":
     main()

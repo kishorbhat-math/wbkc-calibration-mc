@@ -3,9 +3,12 @@ Signal processing stubs for WBKC spectra.
 
 These are intentionally light-weight and easily replaceable with your lab's pipeline.
 """
+
 from __future__ import annotations
+
 import numpy as np
 from scipy.signal import savgol_filter
+
 
 def detrend(energy_keV: np.ndarray, counts: np.ndarray, order: int = 1) -> np.ndarray:
     """
@@ -13,12 +16,15 @@ def detrend(energy_keV: np.ndarray, counts: np.ndarray, order: int = 1) -> np.nd
     """
     x = energy_keV
     y = counts.astype(float)
-    X = np.vander(x - x.mean(), N=order+1, increasing=True)
+    X = np.vander(x - x.mean(), N=order + 1, increasing=True)
     coef, *_ = np.linalg.lstsq(X, y, rcond=None)
     trend = X @ coef
     return y - trend
 
-def sg_smooth(counts: np.ndarray, window_length: int = 31, polyorder: int = 3) -> np.ndarray:
+
+def sg_smooth(
+    counts: np.ndarray, window_length: int = 31, polyorder: int = 3
+) -> np.ndarray:
     """
     Savitzky–Golay smoothing. Ensures odd window length and >= polyorder+2.
     """
@@ -31,7 +37,13 @@ def sg_smooth(counts: np.ndarray, window_length: int = 31, polyorder: int = 3) -
         return counts
     return savgol_filter(counts, window_length=wl, polyorder=polyorder, mode="interp")
 
-def detect_peak(energy_keV: np.ndarray, counts: np.ndarray, guess_keV: float = 1460.0, window_keV: float = 150.0) -> int:
+
+def detect_peak(
+    energy_keV: np.ndarray,
+    counts: np.ndarray,
+    guess_keV: float = 1460.0,
+    window_keV: float = 150.0,
+) -> int:
     """
     Crude K-40 peak detection near ~1460 keV.
     """
@@ -44,6 +56,7 @@ def detect_peak(energy_keV: np.ndarray, counts: np.ndarray, guess_keV: float = 1
         return idx
     local_idx = np.argmax(local)
     return lo + local_idx
+
 
 def find_roi(energy_keV: np.ndarray, peak_idx: int, width_keV: float = 100.0) -> slice:
     """

@@ -17,3 +17,20 @@ wbkc-calibrate = "wbkc:run_calibration"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+# --- tool config ---
+[tool.black]
+line-length = 88
+target-version = ["py311"]
+
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff]
+line-length = 88
+extend-exclude = ["examples/*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]

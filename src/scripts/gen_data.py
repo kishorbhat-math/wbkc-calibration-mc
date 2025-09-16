@@ -1,5 +1,7 @@
 ﻿from __future__ import annotations
+
 import numpy as np
+
 
 def synth_spectrum(tbk_true: float, cps_per: float, live_time_s: int, rng=None):
     """
@@ -29,6 +31,7 @@ def synth_spectrum(tbk_true: float, cps_per: float, live_time_s: int, rng=None):
 
     Y = bg_counts + sig_counts
     return E, Y
+
 
 # Back-compat convenience used by some tests earlier
 def make_synth(true_tbk: float, cps_per_TBK: float, live_time_s: int, rng=None):

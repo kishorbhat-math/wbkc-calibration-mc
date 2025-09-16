@@ -3,12 +3,12 @@ channels:
   - conda-forge
 dependencies:
   - python=3.11
-  - numpy
-  - pandas
-  - scipy
-  - matplotlib
-  - streamlit
-  - pytest
+  - numpy==2.3.2
+  - scipy==1.16.1
+  - pandas==2.3.2
   - pip
   - pip:
-      - ruff
+      - pytest==8.4.2
+      - black==24.10.0
+      - ruff==0.6.9
+      - pre-commit
