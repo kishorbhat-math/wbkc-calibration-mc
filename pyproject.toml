@@ -1,28 +1,22 @@
-[build-system]
-requires = ["setuptools>=68", "wheel"]
+﻿[build-system]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "wbkc-calibration-mc"
-version = "0.1.0"
-description = "Monte Carlo scaffold for WBKC TBK estimation with Streamlit app"
-authors = [{name="wbkc-calibration-mc contributors"}]
-license = {text = "MIT"}
-readme = "README.md"
-requires-python = ">=3.11"
-dependencies = [
-    "numpy",
-    "pandas",
-    "scipy",
-    "matplotlib",
-    "streamlit",
+version = "0.1.1"
+authors = [
+  { name="Kishor Bhat", email="kishorbhat@example.com" }
 ]
-
-[project.optional-dependencies]
-dev = ["pytest", "ruff"]
+description = "Monte Carlo based WBKC calibration models"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "numpy",
+  "scipy",
+  "pandas",
+]
+license = { file = "LICENSE" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.ruff]
-line-length = 100
